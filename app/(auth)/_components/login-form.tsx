@@ -12,6 +12,8 @@ import { z } from 'zod'
 import { signIn } from '@/auth-client'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
+import { FiEye, FiEyeOff } from "react-icons/fi";
+
 
 const loginSchema = z.object({
     email: z.string().email({ message: "Invalid email address" }),
@@ -76,29 +78,45 @@ const LoginForm = () => {
                             </FormItem>
                         )}
                     />
-
+                    
                     <FormField
                         control={form.control}
                         name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-sm font-medium text-gray-700">Password</FormLabel>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <FaLock className="h-5 w-5 text-indigo-400" />
+                        render={({ field }) => {
+                            const [showPassword, setShowPassword] = useState(false);
+
+                            return (
+                                <FormItem>
+                                    <FormLabel className="text-sm font-medium text-gray-700">Password</FormLabel>
+                                    <div className="relative">
+                                        {/* Lock icon on the left */}
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                            <FaLock className="h-5 w-5 text-indigo-400" />
+                                        </div>
+
+                                        <FormControl>
+                                            <Input
+                                                type={showPassword ? "text" : "password"}
+                                                placeholder="••••••••"
+                                                className="pl-10 pr-10 py-3 border border-gray-300 rounded-md bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full"
+                                                {...field}
+                                            />
+                                        </FormControl>
+
+                                        {/* Toggle button (eye icon) on the right */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword((prev) => !prev)}
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 focus:outline-none"
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <FiEyeOff className="h-4 w-4" /> : <FiEye className="h-4 w-4" />}
+                                        </button>
                                     </div>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
-                                            placeholder="••••••••"
-                                            className="pl-10 pr-3 py-3 border border-gray-300 rounded-md bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                </div>
-                                <FormMessage className="text-red-500" />
-                            </FormItem>
-                        )}
+                                    <FormMessage className="text-red-500" />
+                                </FormItem>
+                            );
+                        }}
                     />
                 </div>
 
