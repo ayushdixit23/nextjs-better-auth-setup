@@ -3,7 +3,7 @@ import { FaEnvelope, FaLock, FaUser, FaUserCircle } from 'react-icons/fa'
 import { AvatarImage } from '@/components/ui/avatar'
 import { Avatar } from '@/components/ui/avatar'
 import { motion } from 'motion/react'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { signUp } from '@/auth-client'
 import { toast } from 'react-toastify'
-
+import { FiEye, FiEyeOff } from 'react-icons/fi'
 
 // Zod schema for form validation
 const signupSchema = z.object({
@@ -36,7 +36,6 @@ const signupSchema = z.object({
 type SignUpFormValues = z.infer<typeof signupSchema>
 
 const SignUpForm = () => {
-
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -57,7 +56,7 @@ const SignUpForm = () => {
 
             const { email, password, name, image, username } = signupData
 
-            const { data, error } = await signUp.email({
+            const { error } = await signUp.email({
                 email,
                 password,
                 name,
@@ -72,7 +71,6 @@ const SignUpForm = () => {
             if (error) {
                 toast.error(error.message)
             } else {
-                console.log(data, "data")
                 toast.success("Account created successfully, please verify your email to login")
             }
 
@@ -84,7 +82,6 @@ const SignUpForm = () => {
         }
     };
 
-    // Handle image upload and preview
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files && e.target.files[0];
         if (file) {
@@ -100,7 +97,6 @@ const SignUpForm = () => {
         }
     };
 
-    // Animation variants
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -234,28 +230,45 @@ const SignUpForm = () => {
 
                 {/* Password */}
                 <motion.div variants={itemVariants}>
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                            <FaLock className="h-5 w-5 text-indigo-400" />
-                                        </div>
-                                        <Input
-                                            type="password"
-                                            placeholder="Password"
-                                            {...field}
-                                            className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
-                                        />
-                                    </div>
-                                </FormControl>
+                     <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => {
+                        const [showPassword, setShowPassword] = useState(false);
+                    
+                        return (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium text-gray-700">Password</FormLabel>
+                            <div className="relative">
+                              {/* Lock icon on the left */}
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <FaLock className="h-5 w-5 text-indigo-400" />
+                              </div>
+                    
+                              <FormControl>
+                                <Input
+                                  type={showPassword ? "text" : "password"}
+                                  placeholder="••••••••"
+                                  className="pl-10 pr-10 py-3 border border-gray-300 rounded-md bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full"
+                                  {...field}
+                                />
+                              </FormControl>
+                    
+                              {/* Toggle button (eye icon) on the right */}
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword((prev) => !prev)}
+                                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 focus:outline-none"
+                                tabIndex={-1}
+                              >
+                                {showPassword ? <FiEyeOff className="h-4 w-4" /> : <FiEye className="h-4 w-4" />}
 
-                                <FormMessage className="text-xs mt-1 ml-1 text-red-500" />
-                            </FormItem>
-                        )}
+                              </button>
+                            </div>
+                            <FormMessage className="text-red-500" />
+                          </FormItem>
+                        );
+                      }}
                     />
                 </motion.div>
 
