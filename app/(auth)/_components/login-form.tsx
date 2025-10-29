@@ -51,6 +51,7 @@ export default function LoginForm({
         {
           email: data.email,
           password: data.password,
+          rememberMe: true,
           callbackURL: '/',
         },
         {

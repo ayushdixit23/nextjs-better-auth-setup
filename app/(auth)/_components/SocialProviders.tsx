@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/field'
 import { useState } from 'react'
 import { signIn } from '@/lib/auth-client'
-import { showErrorToast } from '@/lib/toast-config'
+import { showErrorToast, showSuccessToast } from '@/lib/toast-config'
 
 interface SocialProvidersProps {
     mode?: 'login' | 'signup'
@@ -30,6 +30,7 @@ export function SocialProviders({ mode = 'login' }: SocialProvidersProps) {
                 setIsGoogleLoading(false)
                 return
             }
+            showSuccessToast('Login successful!')
         } catch (error: any) {
             showErrorToast(error.message || 'Failed to login with Google. Please try again.')
         } finally {
@@ -49,6 +50,7 @@ export function SocialProviders({ mode = 'login' }: SocialProvidersProps) {
                 setIsGitHubLoading(false)
                 return
             }
+            showSuccessToast('Login successful!')
         } catch (error: any) {
             showErrorToast(error.message || 'Failed to login with GitHub. Please try again.')
         } finally {
