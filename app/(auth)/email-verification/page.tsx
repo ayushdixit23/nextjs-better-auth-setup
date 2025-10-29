@@ -7,7 +7,7 @@ export default function EmailVerified() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/dashboard')
+      router.push('/')
     }, 5000)
 
     return () => clearTimeout(timer)
@@ -19,7 +19,7 @@ export default function EmailVerified() {
         <h1 className="text-2xl font-semibold mb-2">Email Verified ✅</h1>
         <p className="text-gray-700 mb-4">You're all set! Redirecting you to the home page...</p>
         <button
-          onClick={() => router.push('/dashboard')}
+          onClick={() => router.push('/')}
           className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
         >
           Go to Dashboard Now

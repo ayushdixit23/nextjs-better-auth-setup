@@ -184,7 +184,7 @@ export default function VerifyEmail() {
 
         {/* Action Buttons */}
         {isEmailFound && (
-          <Field className="mb-4">
+          <Field>
             <Button onClick={handleOpenEmailApp} className="w-full h-10 font-semibold">
               <ExternalLink className="w-4 h-4 mr-2" />
               {isGmailUser ? "Open Gmail" : "Open Email App"}
@@ -192,7 +192,7 @@ export default function VerifyEmail() {
           </Field>
         )}
 
-        <Field className="mb-6">
+        <Field>
           <Button
             onClick={handleResendEmail}
             disabled={!canResend}

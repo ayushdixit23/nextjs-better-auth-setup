@@ -15,17 +15,21 @@ import { AuthFormFooter } from './AuthFormFooter'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signupSchema, type SignupFormData } from '@/lib/validations/auth'
-import { showSuccessToast, handleFormError } from '@/lib/toast-config'
+import { showSuccessToast, showErrorToast } from '@/lib/toast-config'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Check, X } from 'lucide-react'
+import { signUp } from '@/lib/auth-client'
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [signupError, setSignupError] = useState<string | null>(null)
 
   const {
     register,
@@ -53,18 +57,85 @@ export function SignupForm({
 
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true)
+    setSignupError(null) // Clear previous errors
+    
     try {
-      // TODO: Integrate Better Auth here
-      console.log('Signup data:', data)
-      
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      
-      showSuccessToast('Account created successfully!')
-      // Redirect logic will go here after Better Auth integration
-    } catch (error) {
-      handleFormError(error)
-    } finally {
+      await signUp.email(
+        {
+          email: data.email,
+          password: data.password,
+          name: data.name,
+          callbackURL: '/verify-email',
+        },
+        {
+          onSuccess: async (ctx) => {
+            const { user } = ctx.data || {}
+
+            // Check if user was created
+            if (!user) {
+              setSignupError('Account creation failed. Please try again.')
+              showErrorToast('Account creation failed.')
+              setIsLoading(false)
+              return
+            }
+
+            // Successful signup
+            showSuccessToast(`Account created successfully! Please check ${data.email} to verify.`)
+            
+            // Redirect to verify email page with email parameter
+            setTimeout(() => {
+              router.push(`/verify-email?email=${encodeURIComponent(data.email)}`)
+              setIsLoading(false)
+            }, 1000)
+          },
+          onError: (ctx) => {
+            console.error('Signup error:', ctx.error)
+            const errorMessage = ctx.error.message?.toLowerCase() || ''
+            
+            // Handle specific error cases
+            switch (ctx.error.status) {
+              case 400:
+                // Check if it's a validation error
+                if (errorMessage.includes('email')) {
+                  setSignupError('Invalid email format. Please enter a valid email address.')
+                  showErrorToast('Invalid email format.')
+                } else if (errorMessage.includes('password')) {
+                  setSignupError('Password does not meet requirements. Please check the requirements above.')
+                  showErrorToast('Weak password.')
+                } else {
+                  setSignupError('Invalid input. Please check your details and try again.')
+                  showErrorToast('Invalid input.')
+                }
+                break
+                
+              case 409:
+                // Email already exists
+                setSignupError('This email is already registered. Please login instead.')
+                showErrorToast('Email already registered.')
+                break
+                
+              case 429:
+                setSignupError('Too many signup attempts. Please try again later.')
+                showErrorToast('Too many attempts.')
+                break
+                
+              case 500:
+                setSignupError('Server error. Please try again later.')
+                showErrorToast('Server error.')
+                break
+                
+              default:
+                setSignupError(ctx.error.message || 'Signup failed. Please try again.')
+                showErrorToast(ctx.error.message || 'Signup failed.')
+            }
+            setIsLoading(false)
+          },
+        }
+      )
+    } catch (error: any) {
+      console.error('Unexpected signup error:', error)
+      setSignupError('An unexpected error occurred. Please try again.')
+      showErrorToast('An unexpected error occurred.')
       setIsLoading(false)
     }
   }
@@ -223,6 +294,14 @@ export function SignupForm({
             <FieldDescription>Please confirm your password</FieldDescription>
           )}
         </Field>
+
+        {signupError && (
+          <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-3">
+            <p className="text-sm text-red-600 dark:text-red-400 font-medium text-center">
+              {signupError}
+            </p>
+          </div>
+        )}
 
         <Field>
           <Button 

@@ -1,5 +1,4 @@
 'use client'
-
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,17 +13,21 @@ import { AuthFormFooter } from './AuthFormFooter'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth'
-import { showSuccessToast, handleFormError } from '@/lib/toast-config'
+import { showSuccessToast, showErrorToast, showWarningToast } from '@/lib/toast-config'
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
+import { sendVerificationEmail, signIn } from '@/lib/auth-client'
 
 export default function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [loginError, setLoginError] = useState<string | null>(null)
 
   const {
     register,
@@ -34,43 +37,109 @@ export default function LoginForm({
     resolver: zodResolver(loginSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
+    defaultValues: {
+      email: 'fsayush100@gmail.com',
+      password: 'Ayushdixit@123',
+    },
   })
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
+    setLoginError(null)
     try {
-      // TODO: Integrate Better Auth here
-      console.log('Login data:', data)
-      
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      
-      showSuccessToast('Login successful!')
-      // Redirect logic will go here after Better Auth integration
-    } catch (error) {
-      handleFormError(error)
+      await signIn.email(
+        {
+          email: data.email,
+          password: data.password,
+          callbackURL: '/',
+        },
+        {
+          onSuccess: async (ctx) => {
+            const { user, twoFactorRedirect } = ctx.data || {}
+
+            // Handle 2FA redirect
+            if (twoFactorRedirect) {
+              showSuccessToast(`OTP sent to ${data.email}. Please check your email.`)
+              setTimeout(() => {
+                router.push(`/2fa-verification?email=${encodeURIComponent(data.email)}`)
+                setIsLoading(false)
+              }, 500)
+              return
+            }
+
+            // Check if user exists
+            if (!user) {
+              setLoginError('Login failed. Please try again.')
+              showErrorToast('Login failed. Please try again.')
+              setIsLoading(false)
+              return
+            }
+
+            // Successful login
+            showSuccessToast(`Welcome back, ${user.name || user.email}!`)
+          },
+          onError: async (ctx) => {
+            // Handle specific error cases
+            switch (ctx.error.status) {
+              case 401:
+                setLoginError('Incorrect email or password. Please check your credentials and try again.')
+                showErrorToast('Incorrect email or password.')
+                break
+              case 403:
+                showWarningToast('Please verify your email before logging in. We are sending a verification email to your email address to verify your account and login again.')
+                const result = await sendVerificationEmail({
+                  email: data.email || '',
+                  callbackURL: "/email-verification",
+                })
+                if (result.error) {
+                  showErrorToast(result.error.message || 'Failed to send verification email. Please try again.')
+                  setIsLoading(false)
+                  return
+                } else {
+                  showSuccessToast('Verification email sent successfully! Please check your email to verify your account and login again.')
+                  setTimeout(() => {
+                    router.push(`/verify-email?email=${encodeURIComponent(data.email || '')}`)
+                    setIsLoading(false)
+                  }, 1500)
+                }
+                break
+              case 429:
+                setLoginError('Too many login attempts. Please try again later.')
+                showErrorToast('Too many login attempts. Please try again later.')
+                break
+              default:
+                setLoginError(ctx.error.message || 'Login failed. Please try again.')
+                showErrorToast(ctx.error.message || 'Login failed due to server error.')
+            }
+            setIsLoading(false)
+          },
+        }
+      )
+    } catch (error: any) {
+      setLoginError('An unexpected error occurred. Please try again.')
+      showErrorToast('An unexpected error occurred.')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form 
-      className={cn("flex flex-col gap-6", className)} 
+    <form
+      className={cn("flex flex-col gap-6", className)}
       onSubmit={handleSubmit(onSubmit)}
       {...props}
     >
       <FieldGroup>
-        <AuthFormHeader 
+        <AuthFormHeader
           title="Login to your account"
           description="Enter your email below to login to your account"
         />
-        
+
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input 
-            id="email" 
-            type="email" 
+          <Input
+            id="email"
+            type="email"
             placeholder="m@example.com"
             {...register('email')}
             aria-invalid={errors.email ? 'true' : 'false'}
@@ -92,8 +161,8 @@ export default function LoginForm({
             </Link>
           </div>
           <div className="relative">
-            <Input 
-              id="password" 
+            <Input
+              id="password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               {...register('password')}
@@ -119,9 +188,17 @@ export default function LoginForm({
           )}
         </Field>
 
+        {loginError && (
+          <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-3">
+            <p className="text-sm text-red-600 dark:text-red-400 font-medium text-center">
+              {loginError}
+            </p>
+          </div>
+        )}
+
         <Field>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isLoading}
             className="w-full"
           >
@@ -130,8 +207,8 @@ export default function LoginForm({
         </Field>
 
         <SocialProviders mode="login" />
-        
-        <AuthFormFooter 
+
+        <AuthFormFooter
           text="Don't have an account?"
           linkText="Sign up"
           linkHref="/signup"
