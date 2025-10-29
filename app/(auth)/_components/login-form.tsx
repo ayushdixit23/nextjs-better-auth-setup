@@ -32,7 +32,8 @@ export default function LoginForm({
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: 'onBlur',
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   })
 
   const onSubmit = async (data: LoginFormData) => {

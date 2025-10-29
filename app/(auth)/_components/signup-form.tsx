@@ -34,7 +34,8 @@ export function SignupForm({
     watch,
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
-    mode: 'onBlur',
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   })
 
   const password = watch('password')
