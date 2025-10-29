@@ -160,7 +160,7 @@ export default function OTPVerificationContent() {
   // Show loading state while checking authorization
   if (isCheckingAuth) {
     return (
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm mx-auto">
         <FieldGroup>
           <div className="flex flex-col items-center space-y-4 py-8">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -174,7 +174,7 @@ export default function OTPVerificationContent() {
   // Show unauthorized access message
   if (!isAuthorized) {
     return (
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm mx-auto">
         <FieldGroup>
           <div className="flex flex-col items-center space-y-6">
             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
@@ -199,7 +199,7 @@ export default function OTPVerificationContent() {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-sm mx-auto">
       <FieldGroup>
         <AuthFormHeader 
           title="Two-Factor Authentication"

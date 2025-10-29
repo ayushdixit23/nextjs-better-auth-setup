@@ -39,7 +39,7 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-sm mx-auto">
     <FieldGroup>
       <AuthFormHeader
         title="Reset your password"

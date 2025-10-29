@@ -106,7 +106,7 @@ export default function VerifyEmail() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-md mx-auto">
       <FieldGroup>
         <AuthFormHeader title="Verify Your Email" description="We've sent a verification link to your email address" />
 
