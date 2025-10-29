@@ -8,7 +8,6 @@ import {
 import { useState } from 'react'
 import { signIn } from '@/lib/auth-client'
 import { showErrorToast } from '@/lib/toast-config'
-import { useRouter } from 'next/navigation'
 
 interface SocialProvidersProps {
     mode?: 'login' | 'signup'
@@ -17,7 +16,6 @@ interface SocialProvidersProps {
 export function SocialProviders({ mode = 'login' }: SocialProvidersProps) {
     const [isGoogleLoading, setIsGoogleLoading] = useState(false)
     const [isGitHubLoading, setIsGitHubLoading] = useState(false)
-    const router = useRouter()
     const actionText = mode === 'login' ? 'Login' : 'Sign up'
 
     const handleGoogleLogin = async () => {
