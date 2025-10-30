@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Mail, CheckCircle2, ExternalLink, RefreshCw, AlertCircle } from "lucide-react"
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Field, FieldGroup } from "@/components/ui/field"
 import { AuthFormHeader } from "../_components/AuthFormHeader"
 import { toast } from "react-toastify"
-import { authClient, sendVerificationEmail } from "@/lib/auth-client"
+import { sendVerificationEmail } from "@/lib/auth-client"
 
 export default function VerifyEmail() {
   const [isResending, setIsResending] = useState(false)
@@ -16,7 +15,6 @@ export default function VerifyEmail() {
   const [resendCount, setResendCount] = useState(0)
   const [lastResendTime, setLastResendTime] = useState<Date | null>(null)
   const [emailSent, setEmailSent] = useState(false)
-  const [emailError, setEmailError] = useState(false)
   const searchParams = useSearchParams()
 
   const isEmailFound = !!email
@@ -30,13 +28,7 @@ export default function VerifyEmail() {
     const emailParam = searchParams.get("email")
     if (emailParam) {
       setEmail(emailParam)
-    } else {
-      authClient.getSession().then((session) => {
-        if (session?.data?.user?.email) {
-          setEmail(session.data.user.email)
-        }
-      })
-    }
+    } 
   }, [searchParams])
 
   const handleResendEmail = async () => {
@@ -59,7 +51,7 @@ export default function VerifyEmail() {
         callbackURL: "/email-verification",
       })
       if (result.error) {
-        setEmailError(true)
+
         toast.error(result.error.message || "Failed to resend verification email")
       } else {
         setResendSuccess(true)
@@ -70,8 +62,7 @@ export default function VerifyEmail() {
 
         setTimeout(() => setResendSuccess(false), 5000)
       }
-    } catch (error) {
-      setEmailError(true)
+    } catch {
       toast.error("Failed to resend verification email")
     } finally {
       setIsResending(false)

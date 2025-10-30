@@ -1,14 +1,15 @@
 'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { DEFAULT_REDIRECT_PATH } from '@/app/utils/constants'
 
 export default function EmailVerified() {
   const router = useRouter()
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.push('/')
-    }, 5000)
+      router.push(DEFAULT_REDIRECT_PATH)
+    }, 2500)
 
     return () => clearTimeout(timer)
   }, [router])
@@ -19,7 +20,7 @@ export default function EmailVerified() {
         <h1 className="text-2xl font-semibold mb-2">Email Verified ✅</h1>
         <p className="text-gray-700 mb-4">You're all set! Redirecting you to the home page...</p>
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push(DEFAULT_REDIRECT_PATH)}
           className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
         >
           Go to Home Now
