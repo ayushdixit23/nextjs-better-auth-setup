@@ -71,7 +71,6 @@ export default function VerifyEmail() {
         setTimeout(() => setResendSuccess(false), 5000)
       }
     } catch (error) {
-      console.error("Resend error:", error)
       setEmailError(true)
       toast.error("Failed to resend verification email")
     } finally {

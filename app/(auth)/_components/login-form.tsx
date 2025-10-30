@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
 import { sendVerificationEmail, signIn, twoFactor } from '@/lib/auth-client'
+import { DEFAULT_REDIRECT_PATH } from '@/app/utils/constants'
 
 export default function LoginForm({
   className,
@@ -39,7 +40,7 @@ export default function LoginForm({
     reValidateMode: 'onChange',
     defaultValues: {
       email: 'fsayush100@gmail.com',
-      password: 'Ayushdixit@23',
+      password: 'Ayushdixit23',
     },
   })
 
@@ -52,7 +53,7 @@ export default function LoginForm({
           email: data.email,
           password: data.password,
           rememberMe: true,
-          callbackURL: '/',
+          callbackURL: DEFAULT_REDIRECT_PATH,
         },
         {
           onSuccess: async (ctx) => {

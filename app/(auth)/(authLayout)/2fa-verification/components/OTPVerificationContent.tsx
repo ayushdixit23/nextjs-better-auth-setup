@@ -2,11 +2,11 @@
 
 import { useState, useRef, useEffect, type KeyboardEvent, type ClipboardEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { authClient, twoFactor } from "@/lib/auth-client";
+import { twoFactor } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { AuthFormHeader } from "../../../_components/AuthFormHeader";
-import { Shield, CheckCircle2, Clock, Mail, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Clock, Mail, AlertTriangle } from "lucide-react";
 import { toast } from "react-toastify";
 import { DEFAULT_REDIRECT_PATH } from "@/app/utils/constants";
 

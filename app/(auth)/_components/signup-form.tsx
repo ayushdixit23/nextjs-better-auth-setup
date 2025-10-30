@@ -65,7 +65,6 @@ export function SignupForm({
           email: data.email,
           password: data.password,
           name: data.name,
-          callbackURL: '/verify-email',
         },
         {
           onSuccess: async (ctx) => {
@@ -89,7 +88,6 @@ export function SignupForm({
             }, 1000)
           },
           onError: (ctx) => {
-            console.error('Signup error:', ctx.error)
             const errorMessage = ctx.error.message?.toLowerCase() || ''
             
             // Handle specific error cases
@@ -133,7 +131,6 @@ export function SignupForm({
         }
       )
     } catch (error: any) {
-      console.error('Unexpected signup error:', error)
       setSignupError('An unexpected error occurred. Please try again.')
       showErrorToast('An unexpected error occurred.')
       setIsLoading(false)

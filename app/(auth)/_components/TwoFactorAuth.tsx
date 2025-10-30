@@ -13,7 +13,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import { twoFactor } from "@/lib/auth-client";
 import { toast } from "react-toastify";
 import QRCode from "react-qr-code";
 
@@ -47,7 +47,7 @@ export default function TwoFactorAuth({ user }: TwoFactorAuthProps) {
     setError("");
 
     try {
-      const { data, error } = await authClient.twoFactor.enable({
+      const { data, error } = await twoFactor.enable({
         password,
       });
 
@@ -76,7 +76,7 @@ export default function TwoFactorAuth({ user }: TwoFactorAuthProps) {
     setError("");
 
     try {
-      const { data, error } = await authClient.twoFactor.verifyTotp({
+      const { data, error } = await twoFactor.verifyTotp({
         code: verificationCode,
       });
 
@@ -103,7 +103,7 @@ export default function TwoFactorAuth({ user }: TwoFactorAuthProps) {
     setError("");
 
     try {
-      const { data, error } = await authClient.twoFactor.disable({
+      const { data, error } = await twoFactor.disable({
         password,
       });
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff, Shield, Smartphone, Monitor, Tablet, Check, X, LogOut, Loader2 } from "lucide-react"
-import { useSession, signOut, changePassword, listSessions, revokeSession, revokeSessions } from "@/lib/auth-client"
+import { useSession, changePassword, listSessions, revokeSession, revokeSessions } from "@/lib/auth-client"
 import { toast } from "react-toastify"
 import { useRouter } from "next/navigation"
 import TwoFactorAuth from "./TwoFactorAuth"
@@ -48,7 +48,6 @@ export default function Security() {
             setSessions(prev => prev.filter(s => s.token !== sessionToken))
             toast.success("Session revoked successfully")
         } catch (error) {
-            console.error("Error revoking session:", error)
             toast.error("Failed to revoke session")
         } finally {
             setIsRevokingSession(null)
@@ -90,7 +89,6 @@ export default function Security() {
             await revokeSessions()
             toast.success("Sessions revoked successfully")
         } catch (error) {
-            console.error("Error signing out:", error)
             toast.error("Failed to sign out. Please try again.")
         } finally {
             setIsSigningOutAll(false)
@@ -155,7 +153,6 @@ export default function Security() {
                 setSessions(data || [])
             }
         } catch (error) {
-            console.error("Error loading sessions:", error)
             toast.error("Failed to load sessions")
         } finally {
             setIsLoadingSessions(false)
