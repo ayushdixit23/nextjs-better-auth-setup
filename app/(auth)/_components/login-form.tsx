@@ -18,7 +18,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
-import { sendVerificationEmail, signIn } from '@/lib/auth-client'
+import { sendVerificationEmail, signIn, twoFactor } from '@/lib/auth-client'
 
 export default function LoginForm({
   className,
@@ -39,7 +39,7 @@ export default function LoginForm({
     reValidateMode: 'onChange',
     defaultValues: {
       email: 'fsayush100@gmail.com',
-      password: 'Ayushdixit@123',
+      password: 'Ayushdixit@23',
     },
   })
 
@@ -58,8 +58,13 @@ export default function LoginForm({
           onSuccess: async (ctx) => {
             const { user, twoFactorRedirect } = ctx.data || {}
 
-            // Handle 2FA redirect
             if (twoFactorRedirect) {
+              const { error } = await twoFactor.sendOtp();
+              if (error) {
+                showErrorToast(error.message || 'Failed to send OTP. Please try again.')
+                setIsLoading(false)
+                return
+              }
               showSuccessToast(`OTP sent to ${data.email}. Please check your email.`)
               setTimeout(() => {
                 router.push(`/2fa-verification?email=${encodeURIComponent(data.email)}`)
@@ -68,7 +73,6 @@ export default function LoginForm({
               return
             }
 
-            // Check if user exists
             if (!user) {
               setLoginError('Login failed. Please try again.')
               showErrorToast('Login failed. Please try again.')
@@ -76,11 +80,9 @@ export default function LoginForm({
               return
             }
 
-            // Successful login
             showSuccessToast(`Welcome back, ${user.name || user.email}!`)
           },
           onError: async (ctx) => {
-            // Handle specific error cases
             switch (ctx.error.status) {
               case 401:
                 setLoginError('Incorrect email or password. Please check your credentials and try again.')

@@ -22,7 +22,7 @@ export default function EmailVerified() {
           onClick={() => router.push('/')}
           className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
         >
-          Go to Dashboard Now
+          Go to Home Now
         </button>
       </div>
     </div>

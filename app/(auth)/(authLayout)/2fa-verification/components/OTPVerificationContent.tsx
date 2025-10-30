@@ -8,6 +8,7 @@ import { Field, FieldGroup } from "@/components/ui/field";
 import { AuthFormHeader } from "../../../_components/AuthFormHeader";
 import { Shield, CheckCircle2, Clock, Mail, AlertTriangle } from "lucide-react";
 import { toast } from "react-toastify";
+import { DEFAULT_REDIRECT_PATH } from "@/app/utils/constants";
 
 export default function OTPVerificationContent() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
@@ -115,7 +116,7 @@ export default function OTPVerificationContent() {
         setIsVerified(true);
         toast.success("Login Successfully!");
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push(DEFAULT_REDIRECT_PATH);
         }, 2000);
       }
     } catch (err) {
@@ -133,7 +134,7 @@ export default function OTPVerificationContent() {
     setError("");
 
     try {
-      const { error } = await authClient.twoFactor.sendOtp();
+      const { error } = await twoFactor.sendOtp();
 
       if (error) {
         toast.error(error.message || "Failed to resend code");
