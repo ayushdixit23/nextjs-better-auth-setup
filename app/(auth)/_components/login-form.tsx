@@ -20,6 +20,8 @@ import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
 import { sendVerificationEmail, signIn, twoFactor } from '@/lib/auth-client'
 import { DEFAULT_REDIRECT_PATH } from '@/app/utils/constants'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 
 export default function LoginForm({
   className,
@@ -29,6 +31,7 @@ export default function LoginForm({
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
+  const [rememberMe, setRememberMe] = useState(true)
 
   const {
     register,
@@ -52,7 +55,7 @@ export default function LoginForm({
         {
           email: data.email,
           password: data.password,
-          rememberMe: true,
+          rememberMe: rememberMe,
           callbackURL: DEFAULT_REDIRECT_PATH,
         },
         {
@@ -128,96 +131,79 @@ export default function LoginForm({
   }
 
   return (
-    <form
-      className={cn("flex flex-col gap-6", className)}
-      onSubmit={handleSubmit(onSubmit)}
-      {...props}
-    >
-      <FieldGroup>
-        <AuthFormHeader
-          title="Login to your account"
-          description="Enter your email below to login to your account"
-        />
+    <form className={cn("flex flex-col gap-6")} onSubmit={handleSubmit(onSubmit)}>
+    <FieldGroup>
+      <AuthFormHeader title="Login to your account" description="Enter your email below to login to your account" />
 
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+      <Field>
+        <FieldLabel htmlFor="email">Email</FieldLabel>
+        <Input
+          id="email"
+          type="email"
+          placeholder="m@example.com"
+          {...register("email")}
+          aria-invalid={errors.email ? "true" : "false"}
+          disabled={isLoading}
+        />
+        {errors.email && <p className="text-sm text-destructive mt-1">{errors.email.message}</p>}
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="password">Password</FieldLabel>
+        <div className="relative">
           <Input
-            id="email"
-            type="email"
-            placeholder="m@example.com"
-            {...register('email')}
-            aria-invalid={errors.email ? 'true' : 'false'}
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            {...register("password")}
+            aria-invalid={errors.password ? "true" : "false"}
             disabled={isLoading}
+            className="pr-10"
           />
-          {errors.email && (
-            <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
-          )}
-        </Field>
-
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <Link
-              href="/forgot-password"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
-              Forgot your password?
-            </Link>
-          </div>
-          <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              {...register('password')}
-              aria-invalid={errors.password ? 'true' : 'false'}
-              disabled={isLoading}
-              className="pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
-              tabIndex={-1}
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
-          </div>
-          {errors.password && (
-            <p className="text-sm text-destructive mt-1">{errors.password.message}</p>
-          )}
-        </Field>
-
-        {loginError && (
-          <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-3">
-            <p className="text-sm text-red-600 dark:text-red-400 font-medium text-center">
-              {loginError}
-            </p>
-          </div>
-        )}
-
-        <Field>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className="w-full"
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+            tabIndex={-1}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </Button>
-        </Field>
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+        {errors.password && <p className="text-sm text-destructive mt-1">{errors.password.message}</p>}
+      </Field>
 
-        <SocialProviders mode="login" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="rememberMe"
+            checked={rememberMe}
+            onCheckedChange={(checked) => setRememberMe(checked === "indeterminate" ? true : checked)}
+          />
+          <Label htmlFor="rememberMe" className="text-sm cursor-pointer">
+            Remember me
+          </Label>
+        </div>
+        <Link href="/forgot-password" className="text-sm underline-offset-4 hover:underline">
+          Forgot your password?
+        </Link>
+      </div>
 
-        <AuthFormFooter
-          text="Don't have an account?"
-          linkText="Sign up"
-          linkHref="/signup"
-        />
-      </FieldGroup>
-    </form>
+      {loginError && (
+        <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-3">
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium text-center">{loginError}</p>
+        </div>
+      )}
+
+      <Field>
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading ? "Logging in..." : "Login"}
+        </Button>
+      </Field>
+
+      <SocialProviders mode="login" />
+
+      <AuthFormFooter text="Don't have an account?" linkText="Sign up" linkHref="/signup" />
+    </FieldGroup>
+  </form>
   )
 }
