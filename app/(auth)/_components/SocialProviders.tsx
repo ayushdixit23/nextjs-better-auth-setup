@@ -91,7 +91,7 @@ export function SocialProviders({ mode = 'login' }: SocialProvidersProps) {
                                 />
                             </svg>
                         )}
-                        <span className="sr-only sm:not-sr-only sm:ml-2">
+                        <span className="sm:ml-2">
                             {isGoogleLoading ? 'Connecting...' : `${actionText} with Google`}
                         </span>
                     </Button>
@@ -111,7 +111,7 @@ export function SocialProviders({ mode = 'login' }: SocialProvidersProps) {
                                 />
                             </svg>
                         )}
-                        <span className="sr-only sm:not-sr-only sm:ml-2">
+                        <span className="sm:ml-2">
                             {isGitHubLoading ? 'Connecting...' : `${actionText} with GitHub`}
                         </span>
                     </Button>
